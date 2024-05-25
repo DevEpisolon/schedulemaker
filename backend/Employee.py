@@ -1,35 +1,48 @@
 class Employee:
 
-    def __init__(self,name, scheduledHours, minHours, maxHours):
-        self.scheduled = scheduledHours
+    def __init__(self, name, scheduledHours, minHours, maxHours, roles):
+        self.name = name
+        self.scheduledHours = scheduledHours
         self.minHours = minHours
         self.maxHours = maxHours
+        self.roles = roles
 
     def get_minHours(self):
         return self.minHours
+
     def set_minHours(self, hours):
         self.minHours = hours
 
     def get_maxHours(self):
         return self.maxHours
-    def set_maxHours(self,hours):
+
+    def set_maxHours(self, hours):
         self.maxHours = hours
 
     def get_Name(self):
         return self.name
-    def set_Name(self,name):
+
+    def set_Name(self, name):
         self.name = name
 
     def get_scheduledHours(self):
-        return self.scheduleHours
+        return self.scheduledHours
 
-    def set_scheduledHours(self,hours):
-        self.scheduleHours = hours
+    def set_scheduledHours(self, hours):
+        self.scheduledHours = hours
 
-#check if the user has met min hours for the week
+    def get_roles(self):
+        return self.roles
+
+    def set_roles(self, roles):
+        self.roles = roles
+
+    # Check if the employee has met the minimum hours for the week
     def hasMinHours(self):
-        if (self.scheduleHours >= self.minHours):
-            return True
-        else:
-            return False
+        """""
+            checks if their minimum amount of hours has been met
+            Returns:
+                bool - true or false
+        """
 
+        return self.scheduledHours >= self.minHours

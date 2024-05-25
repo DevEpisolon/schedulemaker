@@ -1,16 +1,17 @@
 class Day:
 
-    def __init__(self,nameofDay,openTime,closeTime,workersPershift,hoursPerShift,shiftsPerDay):
+    def __init__(self,date,openTime,closeTime,workersPershift,hoursPerShift,shiftsPerDay,isClosed):
+        self.date = date
         self.openTime = openTime
         self.closeTime = closeTime
         self.workersPershift = workersPershift
         self.hoursPerShift = hoursPerShift
         self.shiftsPerDay = shiftsPerDay
-
-    def get_nameofDay(self):
-        return self.get_nameofDay()
-    def set_nameofDay(self,day):
-        self.nameOfDay = day
+        self.isClosed = isClosed
+    def get_date(self):
+        return self.date
+    def set_date(self,date):
+        self.date = date
     def get_openTime(self):
         return self.openTime
     def set_openTime(self,time):
@@ -34,3 +35,7 @@ class Day:
         return self.shiftsPerDay
     def set_shiftsPerDay(self,amount_of_shifts):
         self.shiftsPerDay = amount_of_shifts
+    def get_isClosed(self):
+        return self.isClosed
+    def set_isClosed(self,isClosed):
+        self.isClosed = isClosed
