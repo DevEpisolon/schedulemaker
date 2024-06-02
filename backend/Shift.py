@@ -1,10 +1,13 @@
 from Employee import Employee
 class Shift:
+    #add locaiton in a later date
     def __init__(self,startTime,endTime,availableSlots,rolesRequired):
         self.startTime = startTime
         self.endTime = endTime
         self.availableSlots = availableSlots
         self.rolesRequired = rolesRequired
+        self.assigned = []
+        #self.location = location
 
     def get_startTime(self):
         return self.startTime
@@ -25,6 +28,20 @@ class Shift:
         return self.rolesRequired
     def set_rolesRequired(self, roles):
         self.rolesRequired = roles
+    
+    def get_location(self):
+        return self.location
+    def set_location(self,loc):
+        self.Location = loc
+    def get_assigned(self):
+        return self.assigned
+    def set_assigned(self,employees)
+        self.assigned = employees
+    def add_assigned(self,employee)
+        self.assigned.append(employee)
+
+    def check_slots_fuffilled(self)
+        if (self.availableSlots == )
     #Check if has all roles needed and fufilled
     def check_roles_fulfilled(roles_required, employees_assigned):
         """
