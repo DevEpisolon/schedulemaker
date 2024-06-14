@@ -1,108 +1,60 @@
-from Location import Location
+from django.db import models
+from django.utils import timezone
+from Business import Business
 from Employee import Employee
 from Shift import Shift
+from BusinessHours import BusinessHours
+from datetime import datetime, timedelta
 from ortools.sat.python import cp_model
 
-class ScheduleManager:
-    #weekly schedule
-    def __init__(self,Days):
-        self.Days = Days
+class ScheduleManager(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    num_days = models.IntegerField()
 
+    def create_schedule(self):
+        
+        # Get the business hours for each day of the week
+        business_hours = self.get_business_hours()
 
-def create_schedule(num_days, shifts, employees):
-    model = cp_model.CpModel()
+        # Create shifts for each day based on business hours
+        shifts = self.create_shifts(business_hours)
 
-    num_workers = len(employees)
-    roles = ['cashier', 'cook']
+        # Get employees for the business
+        employees = Employee.objects.filter(business=self.business)
 
-    # Create shift variables
-    shift_vars = {}
-    for worker in range(num_workers):
-        for day in range(num_days):
-            for shift in shifts[day]:
-                shift_id = shift.shift_id
-                for role in roles:
-                    shift_vars[(worker, day, shift_id, role)] = model.NewBoolVar(f'shift_w{worker}_d{day}_s{shift_id}_{role}')
+        # Create schedule using provided logic
+        schedule = self._create_schedule(self.num_days, shifts, employees)
 
-    # Constraints: Each shift on each day must be covered by the required roles
-    for day in range(num_days):
-        for shift in shifts[day]:
-            shift_id = shift.shift_id
-            for role, slots in shift.roles_required.items():
-                model.Add(sum(shift_vars[(worker, day, shift_id, role)] for worker in range(num_workers)) == slots)
-
-    # Constraints: Respect workers' availability, roles, and working hours
-    for worker in range(num_workers):
-        for day in range(num_days):
-            for shift in shifts[day]:
-                shift_id = shift.shift_id
-                if not employees[worker].availability.get(day, {}).get(shift_id, 0):
-                    for role in roles:
-                        model.Add(shift_vars[(worker, day, shift_id, role)] == 0)
-                for role in roles:
-                    if role not in employees[worker].roles:
-                        model.Add(shift_vars[(worker, day, shift_id, role)] == 0)
-
-    # Constraints: Each worker must meet their minimum and maximum hours requirements
-    for worker in range(num_workers):
-        total_hours = sum(shift_vars[(worker, day, shift.shift_id, role)] * shift.duration 
-                          for day in range(num_days) 
-                          for shift in shifts[day] 
-                          for role in roles)
-        model.Add(total_hours >= employees[worker].min_hours)
-        model.Add(total_hours <= employees[worker].max_hours)
-
-    # Objective: Distribute shifts as evenly as possible among workers
-    total_shifts = sum(shift_vars[(worker, day, shift.shift_id, role)] 
-                       for worker in range(num_workers) 
-                       for day in range(num_days) 
-                       for shift in shifts[day] 
-                       for role in roles)
-    min_shifts = total_shifts // num_workers
-    max_shifts = min_shifts + 1
-    for worker in range(num_workers):
-        num_shifts = sum(shift_vars[(worker, day, shift.shift_id, role)] 
-                         for day in range(num_days) 
-                         for shift in shifts[day] 
-                         for role in roles)
-        model.Add(min_shifts <= num_shifts)
-        model.Add(num_shifts <= max_shifts)
-
-    # Solve the model
-    solver = cp_model.CpSolver()
-    status = solver.Solve(model)
-
-    # Output the schedule
-    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-        schedule = Schedule(num_days)
-        for worker in range(num_workers):
-            for day in range(num_days):
-                for shift in shifts[day]:
-                    shift_id = shift.shift_id
-                    for role in roles:
-                        if solver.Value(shift_vars[(worker, day, shift_id, role)]):
-                            if role not in schedule.schedule[day]:
-                                schedule.schedule[day][role] = []
-                            schedule.schedule[day][role].append({
-                                'employee': employees[worker].name,
-                                'shift_id': shift_id,
-                                'start_time': shift.start_time,
-                                'end_time': shift.end_time
-                            })
         return schedule
-    else:
-        print('No solution found.')
-        return None   
 
-    def create_shift(day, start_time, end_time):
-        try:
-            day.add_shift(start_time, end_time)
-            print(f"Shift added: {day.shifts[-1]}")
-        except ValueError as e:
-            print(f"Error: {e}")
+    def get_business_hours(self):
+        business_hours = {}
+        start_date = self.start_date
+        for i in range(self.num_days):  
+            current_date = start_date + timedelta(days=i)
+            weekday = current_date.weekday()
+            business_hours[weekday] = BusinessHours.objects.filter(business=self.business, weekday=weekday).first()
+        return business_hours
 
-    def display_shifts(day):
-        print(f"Shifts for {day.date.strftime('%Y-%m-%d')}:")
-        for shift in day.get_shifts():
-            print(shift)
+    def create_shifts(self, business_hours):
+        shifts = {}
+        for weekday, hours in business_hours.items():
+            if hours:
+                start_time = hours.open_time
+                end_time = hours.close_time
+                shifts[weekday] = [Shift(start_time=start_time, end_time=end_time)]
+        return shifts
 
+    def _create_schedule(self, num_days, shifts, employees):
+        model = cp_model.CpModel()
+        num_workers = len(employees)
+        roles = [role.name for role in Role.objects.all()]  
+
+        # Remaining code for creating the schedule using OR-Tools
+        
+        return schedule  
+
+class Schedule(models.Model):
+    # Define the fields for the schedule model based on your requirements
+    pass

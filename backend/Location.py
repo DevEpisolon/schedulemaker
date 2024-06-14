@@ -1,12 +1,7 @@
-class Location:
+from django.db import models
 
-    def __init__(self,adress):
-        self.adress = adress
+class Location(models.Model):
+    address = models.CharField(max_length=255)
 
-    def get_adress(self):
-        return self.adress
-    def set_adress(self,adress):
-        self.adress = adress
-
-
-
+    def __str__(self):
+        return self.address

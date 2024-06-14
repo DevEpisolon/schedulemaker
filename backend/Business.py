@@ -1,25 +1,9 @@
-class Business:
+from django.db import models
 
-    def __init__(self,name,adress,weeklyHours):
-        self.name = name
-        self.adress = adress
-        self.weeklyHours = weeklyHours
+class Business(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    weekly_hours = models.IntegerField()
 
-    def get_name(self):
+    def __str__(self):
         return self.name
-    def set_name(self,name):
-        self.name = name
-
-    def get_adress(self):
-        return self.adress
-    def set_adress(self,adress):
-        self.adress = adress
-
-    def get_weekllyHours(self):
-        return self.weeklyHours
-    def set_weeklyHours(self,hours):
-        self.weeklyHours = hours
-
-
-
-
