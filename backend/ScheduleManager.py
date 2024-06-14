@@ -94,3 +94,15 @@ def create_schedule(num_days, shifts, employees):
         print('No solution found.')
         return None   
 
+    def create_shift(day, start_time, end_time):
+        try:
+            day.add_shift(start_time, end_time)
+            print(f"Shift added: {day.shifts[-1]}")
+        except ValueError as e:
+            print(f"Error: {e}")
+
+    def display_shifts(day):
+        print(f"Shifts for {day.date.strftime('%Y-%m-%d')}:")
+        for shift in day.get_shifts():
+            print(shift)
+

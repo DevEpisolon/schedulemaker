@@ -8,10 +8,30 @@ class Day:
         self.closeTime = closeTime
         self.workersPershift = workersPershift
         self.minHoursPerShift = minHoursPerShift
-        self.maxHoursPerShift = maxHoursPershift
+        self.maxHoursPerShift = maxHoursPerShift
         self.minShiftsPerDay = minShiftsPerDay
         self.isClosed = isClosed
    
+    def add_shift(self, start_time, end_time):
+        if self.is_closed:
+            raise ValueError("Cannot add shifts to a closed day.")
+        
+        if not (self.open_time <= start_time < end_time <= self.close_time):
+            raise ValueError("Shift time must be within store hours.")
+        
+        shift_duration = datetime.combine(self.date, end_time) - datetime.combine(self.date, start_time)
+        if not (self.min_hours_per_shift <= shift_duration <= timedelta(hours=self.max_hours_per_shift)):
+            raise ValueError("Shift duration must be within allowed hours per shift.")
+        
+        if len(self.shifts) >= self.max_shifts_per_day:
+            raise ValueError("Cannot add more shifts, maximum shifts per day reached.")
+
+        shift = Shift(self, start_time, end_time)
+        self.shifts.append(shift)
+
+    def get_shifts(self):
+        return self.shifts
+ 
     def get_date(self):
         return self.date
     def set_date(self,date):
@@ -59,8 +79,7 @@ class Day:
     def set_isClosed(self,isClosed):
         self.isClosed = isClosed
 
-
     def __str__(self):
-        openTime_str = self.openTime.strftime('%Y-%m-%d %H:%M') if self.openTime else 'Not Set'
-        closeTime_str = self.closetime.strftime('%Y-%m-%d %H:%M') if self.closeTime else 'Not Set'
-        return f"Date: {self.date.strftime('%Y-%m-%d')}, Start Time: {openTime_str}, End Time: {closeTime_str}"
+        open_time_str = self.open_time.strftime('%H:%M') if self.open_time else 'Not Set'
+        close_time_str = self.close_time.strftime('%H:%M') if self.close_time else 'Not Set'
+        return f"Date: {self.date.strftime('%Y-%m-%d')}, Open Time: {open_time_str}, Close Time: {close_time_str}, Shifts: {len(self.shifts)}"

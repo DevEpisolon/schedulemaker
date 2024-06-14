@@ -35,13 +35,11 @@ class Shift:
         self.Location = loc
     def get_assigned(self):
         return self.assigned
-    def set_assigned(self,employees)
+    def set_assigned(self,employees):
         self.assigned = employees
-    def add_assigned(self,employee)
+    def add_assigned(self,employee):
         self.assigned.append(employee)
 
-    def check_slots_fuffilled(self)
-        if (self.availableSlots == )
     #Check if has all roles needed and fufilled
     def check_roles_fulfilled(roles_required, employees_assigned):
         """

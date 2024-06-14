@@ -1,12 +1,24 @@
+from datetime import datetime, time, timedelta
+from collections import defaultdict
+
+
 class Employee:
 
-    def __init__(self, name, scheduledHours, minHours, maxHours, roles):
+    def __init__(self, name, availability, scheduledHours, minHours, maxHours, roles):
         self.name = name
         self.scheduledHours = scheduledHours
         self.minHours = minHours
         self.maxHours = maxHours
         self.roles = roles
-
+        self.availability = availability
+        self.assignedShifts = []
+    def can_work(self,day, shift_id,role):
+        if day not in self.avaiability or shift_id not in self.availability[day]:
+            return False 
+        if role not in self.roles:
+            return False
+        return True
+    
     def get_minHours(self):
         return self.minHours
 
